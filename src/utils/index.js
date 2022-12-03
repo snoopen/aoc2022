@@ -22,3 +22,7 @@
  *     import myLib from '../utils/myLib'
  *     import { myUtil } from '../utils'
  */
+
+export function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
