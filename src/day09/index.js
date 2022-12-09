@@ -15,10 +15,16 @@ const dirs = {
 const part1 = (rawInput) => {
   const input = parseInput(rawInput);
 
-  const visited = new Set();
+  const visited = {};
   const rope = {
     head: { x: 0, y: 0 },
     tail: { x: 0, y: 0 },
+  };
+  const limits = {
+    xMin: 0,
+    xMax: 0,
+    yMin: 0,
+    yMax: 0,
   };
   
   for (let move of input) {
@@ -28,11 +34,15 @@ const part1 = (rawInput) => {
       rope.head.x += dir.x;
       rope.head.y += dir.y;
       moveTail(rope);
-      visited.add(`${rope.tail.x}:${rope.tail.y}`);
+      const key = [rope.tail.x, rope.tail.y].join(";");
+      visited[key] = [rope.tail.x, rope.tail.y];
+      updateLimits(limits, rope.head.x, rope.head.y);
     }
   };
 
-  return visited.size;
+  // printRope(rope, limits);
+
+  return Object.keys(visited).length;
 };
 
 function moveTail(rope) {
@@ -53,20 +63,41 @@ function moveTail(rope) {
   }
 }
 
-function printMap(rope) {
-  const print = new Array(10).fill().map(()=>new Array(10).fill().map(()=>'.'));
-  print[0][0] = 's';
-  print[rope.tail.y][rope.tail.x] = 'T';
-  print[rope.head.y][rope.head.x] = 'H';
+function printRope(rope, limits) {
+  const xOffset = - limits.xMin;
+  const yOffset = - limits.yMin;
+  const xSize = (limits.xMax - xOffset) - (limits.xMin - xOffset);
+  const ySize = (limits.yMax - yOffset) - (limits.yMin - yOffset);
+  const print = new Array(ySize)
+    .fill().map(() => new Array(xSize)
+      .fill().map(()=>'.')
+    );
+  print[0 + yOffset][0 + xOffset] = 's';
+  print[rope.tail.y + yOffset][rope.tail.x + xOffset] = 'T';
+  print[rope.head.y + yOffset][rope.head.x + xOffset] = 'H';
   console.log(print.map(e=>e.join('')).join('\n') + '\n');
+}
+
+function updateLimits(limits, x, y) {
+  if (x > limits.xMax) limits.xMax = x;
+  if (x < limits.xMin) limits.xMin = x;
+  if (y > limits.yMax) limits.yMax = y;
+  if (y < limits.yMin) limits.yMin = y;
 }
 
 const part2 = (rawInput) => {
   const input = parseInput(rawInput);
 
-  const visited = new Set();
+  const visited = {};
   const knots = 10;
   const rope = new Array(knots).fill().map(()=>({ x: 0, y: 0 }));
+
+  const limits = {
+    xMin: 0,
+    xMax: 0,
+    yMin: 0,
+    yMax: 0,
+  };
   
   for (let move of input) {
     const dir = dirs[move.dir];
@@ -75,13 +106,16 @@ const part2 = (rawInput) => {
       rope[0].x += dir.x;
       rope[0].y += dir.y;
       moveTail2(rope);
-      visited.add(`${rope[knots - 1].x}:${rope[knots - 1].y}`);
+      const pos = { x: rope[knots - 1].x, y: rope[knots - 1].y };
+      const key = [pos.x, pos.y].join(';');
+      visited[key] = pos;
+      updateLimits(limits, rope[0].x, rope[0].y);
     }
   };
 
-  // printMap2(visited);
+  printVisited(visited, limits);
 
-  return visited.size;
+  return Object.keys(visited).length;
 };
 
 function moveTail2(rope, index = 0) {
@@ -105,15 +139,22 @@ function moveTail2(rope, index = 0) {
   }
 }
 
-function printMap2(visited) {
-  const vis = Array.from(visited).map(e=>{
-    e = e.split(':');
-    return { x: e[0]  * 1, y: e[1] * 1 };
-  });
-  const print = new Array(30).fill().map(()=>new Array(30).fill().map(()=>'.'));
+function printVisited(visited, limits) {
+  const vis = Object.values(visited);
+  
+  const border = 1;
+  const xOffset = - limits.xMin;
+  const yOffset = - limits.yMin;
+  const xSize = (limits.xMax - xOffset) - (limits.xMin - xOffset);
+  const ySize = (limits.yMax - yOffset) - (limits.yMin - yOffset);
+  const print = new Array(ySize + border * 2)
+    .fill().map(() => new Array(xSize + border * 2)
+      .fill().map(()=>'.')
+    );
+
   print[0][0] = 's';
-  vis.forEach((e,i)=>{
-    print[e.y + 6][e.x + 12] = '#';
+  vis.forEach(e=>{
+    print[e.y + yOffset + border][e.x + xOffset + border] = '#';
   });
   console.log(print.map(e=>e.join('')).join('\n') + '\n');
 }
