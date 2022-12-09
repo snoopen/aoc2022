@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { drawVisited } from "./image.js";
 
 const parseInput = (rawInput) => rawInput.split(/\n/).map(e=>{
   e = e.split(' ');
@@ -114,6 +115,7 @@ const part2 = (rawInput) => {
   };
 
   printVisited(visited, limits);
+  drawVisited(visited, limits);
 
   return Object.keys(visited).length;
 };

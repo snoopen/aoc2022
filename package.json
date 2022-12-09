@@ -17,7 +17,10 @@
     "aocrunner": "^1.6.1",
     "prettier": "^2.4.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "canvas": "^2.10.2",
+    "gifencoder": "^2.0.1"
+  },
   "engines": {
     "node": ">=16.13.0"
   }
