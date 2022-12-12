@@ -106,16 +106,22 @@ const part1 = (rawInput) => {
 const part2 = (rawInput) => {
   const { nodes, startNode, endNode } = parseInput(rawInput);
 
+  nodes[startNode.y][startNode.x].visited = false;
+  nodes[startNode.y][startNode.x].distance = Infinity;
+  nodes[endNode.y][endNode.x].distance = 0;
+  nodes[endNode.y][endNode.x].visited = true;
+
   let options = [];
   for (let y = nodes.length - 1; y >= 0; y--) {
     for (let x = nodes[0].length - 1; x >= 0; x--) {
-      if (x === startNode.x && y === startNode.y) {
+      if (x === endNode.x && y === endNode.y) {
       } else {
         options.push({ x, y });
       }
     }
   }
-  options.push(startNode);
+  
+  options.push(endNode);
 
   while (options.length > 0) {
     const pos = options.pop();
@@ -125,7 +131,7 @@ const part2 = (rawInput) => {
     let tentative = getNeighbours(pos);
     tentative = tentative.filter((newPos) => boundsCheck(nodes, newPos));
     tentative = tentative.filter((newPos) => !isVisited(nodes, newPos));
-    tentative = tentative.filter((newPos) => heightCheck(nodes, pos, newPos));
+    tentative = tentative.filter((newPos) => heightCheck(nodes, newPos, pos));
 
     for (const nextPos of tentative) {
       const nextDist = nodes[nextPos.y][nextPos.x].distance;
@@ -149,7 +155,15 @@ const part2 = (rawInput) => {
     }
   }
 
-  return;
+  options = options.filter(posA => nodes[posA.y][posA.x].char === 'a');
+  options = options.sort(
+    (posA, posB) =>
+      nodes[posA.y][posA.x].distance - nodes[posB.y][posB.x].distance,
+  );
+
+  // printMap(nodes);
+  const shortPos = options[0];
+  return nodes[shortPos.y][shortPos.x].distance;
 };
 
 run({
@@ -184,5 +198,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  // onlyTests: true,
 });
