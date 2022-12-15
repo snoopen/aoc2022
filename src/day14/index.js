@@ -50,14 +50,6 @@ function getMinMax(last, next) {
   return result;
 }
 
-function updateBoundsMyMinMax(bounds, minMax) {
-  if (bounds.xMin === -1 || bounds.xMin > minMax.xMin) bounds.xMin = minMax.xMin;
-  if (bounds.xMax === -1 || bounds.xMax < minMax.xMax) bounds.xMax = minMax.xMax;
-  if (bounds.yMin === -1 || bounds.yMin > minMax.yMin) bounds.yMin = minMax.yMin;
-  if (bounds.yMax === -1 || bounds.yMax < minMax.yMax) bounds.yMax = minMax.yMax;
-  return bounds;
-}
-
 function updateBoundsByPos(bounds, pos) {
   if (bounds.xMin === -1 || bounds.xMin > pos[0]) bounds.xMin = pos[0];
   if (bounds.xMax === -1 || bounds.xMax < pos[0]) bounds.xMax = pos[0];
