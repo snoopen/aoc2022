@@ -270,7 +270,12 @@
       "part2": {
         "solved": false,
         "result": null,
-        "attempts": [],
+        "attempts": [
+          "4058",
+          "3452",
+          "836",
+          "659"
+        ],
         "time": null
       }
     },
