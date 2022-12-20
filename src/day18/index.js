@@ -16,6 +16,12 @@ class GridSystem {
   constructor(input) {
     for (const droplet of input) {
       this.addDroplet(droplet);
+      if (droplet[0] < this.limits.x.min) this.limits.x.min = droplet[0];
+      if (droplet[0] > this.limits.x.max) this.limits.x.max = droplet[0];
+      if (droplet[1] < this.limits.y.min) this.limits.y.min = droplet[1];
+      if (droplet[1] > this.limits.y.max) this.limits.y.max = droplet[1];
+      if (droplet[2] < this.limits.z.min) this.limits.z.min = droplet[2];
+      if (droplet[2] > this.limits.z.max) this.limits.z.max = droplet[2];
     }
     for (const droplet of input) {
       for (const dir of dirs) {
@@ -29,6 +35,21 @@ class GridSystem {
 
   dropGrid = new Map();
   edgeGrid = new Map();
+  
+  limits = {
+    x: {
+      min: Infinity,
+      max: 0,
+    },
+    y: {
+      min: Infinity,
+      max: 0,
+    },
+    z: {
+      min: Infinity,
+      max: 0,
+    },
+  };
 
   drops = 0;
   edges = 0;
@@ -94,6 +115,43 @@ class GridSystem {
     return count;   
   }
 
+  findAllExternalFaces() {
+    let faces = 0;
+    const done = new Set();
+    const queue = [
+      [
+        this.limits.x.min - 1,
+        this.limits.y.min - 1,
+        this.limits.z.min - 1,
+      ],
+    ];
+    while (queue.length > 0) {
+      const coord = queue.pop();
+      const key = coord.join(';');
+      done.add(key);
+      for (const dir of dirs) {
+        const nextCoord = addCoords(coord, dir);
+        const nextKey = nextCoord.join(';');
+        if (done.has(nextKey)) continue;
+        if (
+          nextCoord[0] < this.limits.x.min - 1 ||
+          nextCoord[1] < this.limits.y.min - 1 ||
+          nextCoord[2] < this.limits.z.min - 1 ||
+          nextCoord[0] > this.limits.x.max + 1 ||
+          nextCoord[1] > this.limits.y.max + 1 ||
+          nextCoord[2] > this.limits.z.max + 1
+          ) continue;
+          const isDrop  = this.getFromGrid(this.dropGrid, nextCoord);
+          if (isDrop) {
+            faces++;
+          } else {
+            done.add(nextKey);
+            queue.push(nextCoord);
+          }
+      }
+    }
+    return faces;
+  }
 }
 
 function addCoords(coord1, coord2) {
@@ -113,8 +171,8 @@ const part1 = (rawInput) => {
 
 const part2 = (rawInput) => {
   const input = parseInput(rawInput);
-  
-  return;
+  const system = new GridSystem(input);
+  return system.findAllExternalFaces();
 };
 
 run({
@@ -145,9 +203,21 @@ run({
     tests: [
       {
         input: `
-
+          2,2,2
+          1,2,2
+          3,2,2
+          2,1,2
+          2,3,2
+          2,2,1
+          2,2,3
+          2,2,4
+          2,2,6
+          1,2,5
+          3,2,5
+          2,1,5
+          2,3,5
         `,
-        expected: "",
+        expected: 58,
       },
     ],
     solution: part2,
